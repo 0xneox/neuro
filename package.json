@@ -19,6 +19,7 @@
     "recharts": "^2.12.7",
     "recoil": "^0.5.2",
     "styled-components": "^5.3.11"
+    "react-confetti": "^9.6.7"
   },
   "scripts": {
     "start": "react-scripts start",
