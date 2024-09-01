@@ -1,137 +1,144 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
+import Confetti from 'react-confetti';
 import { claimDailyXP, createUserProfile, initializeTelegramAuth } from '../services/api';
 import useApi from '../hooks/useApi';
 import { useAuth } from '../context/AuthContext';
-import logo from "../Images/logo.png";
-import fanImage from "../Images/newfan.png";
-import backgroundImage from "../Images/bg_pattern.svg";
-import tokenSymbolSvg from "../Images/questIcon.png";
-
-const glowAnimation = keyframes`
-  0% { opacity: 0.5; }
-  50% { opacity: 1; }
-  100% { opacity: 0.5; }
-`;
+import backgroundVideo from '../videos/video.mp4';
+import fallbackImage from '../Images/claimbg.jpg';
+import logo from '../Images/logo.png';
+import neuro from '../Images/logo1.png'; // New logo for the left side
 
 const CheckInWrapper = styled.div`
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  background-color: #000033;
-  background-image: url(${backgroundImage});
+  justify-content: center;
+  align-items: center;
+  background-image: url(${fallbackImage});
   background-size: cover;
   background-position: center;
-  color: #ffffff;
-  font-family: 'Arial', sans-serif;
-  user-select: none;
 `;
 
-const Header = styled.header`
+const VideoBackground = styled.video`
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  z-index: -1;
+  object-fit: cover;
+`;
+
+const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(5px);
+  padding: 10px 20px;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
 `;
 
 const Logo = styled.img`
-  width: 150px;
+  height: 40px;
+
+    padding: 10px 20px;
+
 `;
 
-const MainContent = styled.div`
-  flex-grow: 1;
+const Neuro = styled.img`
+  height: 40px;
+  width: auto;
+`;
+
+const Content = styled.div`
+  z-index: 1;
+  text-align: center;
+  color: white;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px;
-`;
-
-const FanContainer = styled.div`
-  position: relative;
-  width: 300px;
-  height: 300px;
-  display: flex;
   justify-content: center;
   align-items: center;
-`;
-
-const BreathingLight = styled(motion.div)`
-  position: absolute;
-  width: 100%;
   height: 100%;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(23,230,235,0.5) 0%, rgba(17,96,217,0.5) 100%);
-  animation: ${glowAnimation} 4s infinite ease-in-out;
+  width: 100%;
 `;
 
-const FanImage = styled(motion.img)`
-  width: 90%;
-  height: 90%;
-  position: relative;
-  z-index: 1;
-`;
-
-const CheckInTitle = styled.h1`
-  font-size: 2.5rem;
-  margin-top: 20px;
-  text-align: center;
-`;
-
-const ClaimContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 30px;
+const ClaimTitle = styled.h2`
+  font-size: 2rem;
+  margin-bottom: 20px;
+  text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
 `;
 
 const XPText = styled(motion.div)`
-  font-size: 36px;
+  font-size: 48px;
   font-weight: bold;
+  margin-bottom: 30px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  color: #ffd700;
+  font-family: 'Roboto', sans-serif;
+`;
+
+const ClaimButton = styled.button`
+ align-items: center;
+  background-image: linear-gradient(144deg,#AF40FF, #5B42F3 50%,#00DDEB);
+  border: 0;
+  border-radius: 8px;
+  box-shadow: rgba(151, 65, 252, 0.2) 0 15px 30px -5px;
+  box-sizing: border-box;
+  color: #FFFFFF;
   display: flex;
-  align-items: center;
+  font-family: Phantomsans, sans-serif;
+  font-size: 18px;
   justify-content: center;
-  margin-bottom: 20px;
-`;
-
-const TokenSymbol = styled.img`
-  width: 24px;
-  height: 24px;
-  margin-right: 10px;
-`;
-
-const ClaimButton = styled(motion.button)`
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  padding: 15px 60px;
-  border-radius: 50px;
-  font-size: 1.2rem;
-  font-weight: 700;
+  line-height: 1em;
+  max-width: 100%;
+  min-width: 140px;
+  padding: 3px;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  white-space: nowrap;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all .3s;
 
-  &:hover {
-    background-color: #2563eb;
+
+
+  span {
+      background-color: rgb(5, 6, 45);
+  padding: 16px 24px;
+  border-radius: 6px;
+  width: 100%;
+  height: 100%;
+  transition: 300ms;
   }
 
-  &:disabled {
-    background-color: #6b7280;
-    cursor: not-allowed;
-  }
+
+
+
 `;
+
 function CheckIn() {
   const [claimed, setClaimed] = useState(false);
-  const [claimAmount, setClaimAmount] = useState(100);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [videoError, setVideoError] = useState(false);
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
   const { execute: executeClaim, loading: claimLoading } = useApi(claimDailyXP);
-  const { execute: executeCreateProfile, loading: createProfileLoading } = useApi(createUserProfile);
-  const { execute: executeInitAuth, loading: authLoading } = useApi(initializeTelegramAuth);
+  const { execute: executeCreateProfile } = useApi(createUserProfile);
+  const { execute: executeInitAuth } = useApi(initializeTelegramAuth);
 
   useEffect(() => {
     const initializeUser = async () => {
@@ -139,92 +146,87 @@ function CheckIn() {
         const tg = window.Telegram?.WebApp;
         if (tg && tg.initDataUnsafe) {
           try {
-            // Initialize Telegram auth
             const authResult = await executeInitAuth(tg.initDataUnsafe);
-            
-            // If auth is successful, create or update the user profile
             if (authResult.token) {
               localStorage.setItem('token', authResult.token);
               const newUser = await executeCreateProfile(authResult.user);
               setUser(newUser);
+              if (newUser.lastClaimTime && Date.now() - new Date(newUser.lastClaimTime).getTime() < 24 * 60 * 60 * 1000) {
+                navigate('/home');
+              }
             }
           } catch (error) {
             console.error('Failed to initialize user:', error);
-            // Handle error (e.g., show error message to user)
           }
         }
+      } else if (user.lastClaimTime && Date.now() - new Date(user.lastClaimTime).getTime() < 24 * 60 * 60 * 1000) {
+        navigate('/home');
       }
     };
     initializeUser();
-  }, [user, setUser, executeCreateProfile, executeInitAuth]);
-
+  }, [user, setUser, executeCreateProfile, executeInitAuth, navigate]);
 
   const handleClaim = async () => {
     if (claimLoading) return;
 
     try {
-      const result = await executeClaim();
-      setClaimAmount(result.amount);
+      await executeClaim();
       setClaimed(true);
-      setUser(prevUser => ({ ...prevUser, xp: (prevUser?.xp || 0) + result.amount }));
-      
-      // Animation and transition
+      setShowConfetti(true);
+      setUser(prevUser => ({ ...prevUser, xp: (prevUser?.xp || 0) + 100, lastClaimTime: new Date() }));
+
       setTimeout(() => {
+        setShowConfetti(false);
         navigate('/home');
       }, 3000);
     } catch (error) {
       console.error('Claim failed:', error);
-      // Handle error (e.g., show error message to user)
     }
   };
 
-  const loading = claimLoading || createProfileLoading || authLoading;
-
   return (
     <CheckInWrapper>
+      {!videoError && (
+        <VideoBackground 
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+          onError={() => setVideoError(true)}
+        >
+          <source src={backgroundVideo} type="video/mp4" />
+        </VideoBackground>
+      )}
       <Header>
-        <Logo src={logo} alt="Logo" />
+        <Logo src={logo} alt="New Logo" /> {/* Left Logo */}
+        <Neuro src={neuro} alt="Neurolov Logo" /> {/* Right Logo */}
       </Header>
-
-      <MainContent>
-        <FanContainer>
-          <BreathingLight 
-            animate={{ opacity: claimed ? 0.8 : 0.5 }}
-          />
-          <FanImage 
-            src={fanImage} 
-            alt="Fan" 
-            animate={{ rotate: claimed ? 360 : 0 }}
-            transition={{ duration: 1 }}
-          />
-        </FanContainer>
-
-        <CheckInTitle>Daily Check-in</CheckInTitle>
-
-        <ClaimContainer>
-          <AnimatePresence>
-            <XPText
-              key={claimed ? 'claimed' : 'unclaimed'}
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -50 }}
-            >
-              <TokenSymbol src={tokenSymbolSvg} alt="XP" />
-              {claimed ? `You claimed ${claimAmount} XP!` : `+${claimAmount} XP`}
-            </XPText>
-          </AnimatePresence>
-          <ClaimButton
-            onClick={handleClaim}
-            disabled={loading || claimed}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+      <Content>
+        <ClaimTitle>Daily Claim</ClaimTitle>
+        <AnimatePresence>
+          <XPText
+            key={claimed ? 'claimed' : 'unclaimed'}
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.5 }}
           >
-            {loading ? 'Processing...' : claimed ? 'Claimed!' : 'Claim XP'}
-          </ClaimButton>
-        </ClaimContainer>
-      </MainContent>
+            100 XP
+          </XPText>
+        </AnimatePresence>
+        <ClaimButton onClick={handleClaim} disabled={claimed}>
+         
+          <span>{claimed ? 'Claimed!' : 'Claim'}</span>
+        </ClaimButton>
+      </Content>
+      {showConfetti && <Confetti />}
     </CheckInWrapper>
   );
 }
 
 export default CheckIn;
+
+/* From Uiverse.io by cssbuttons-io */ 
+
+ 
+
+ 

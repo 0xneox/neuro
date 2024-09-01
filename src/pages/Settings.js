@@ -6,19 +6,47 @@ import { updateSettings } from '../services/api';
 import useApi from '../hooks/useApi';
 import Navbar from '../components/Navbar';
 import { FaBell, FaVolumeMute, FaGlobe, FaEye, FaQuestionCircle, FaShieldAlt, FaFileContract, FaSignOutAlt, FaTrash } from 'react-icons/fa';
+import logo from '../Images/logo.png';
+import neuro from '../Images/logo1.png';
+import backgroundImage from "../Images/bg_pattern.svg";
 
 const SettingsWrapper = styled(motion.div)`
-  padding: 20px;
+  position: relative;
+  min-height: 100vh;
+  width: 100vw;
   color: #ffffff;
   background: linear-gradient(180deg, #000033 0%, #000066 100%);
-  min-height: 100vh;
+  background-image: url(${backgroundImage});
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
 `;
 
 const Header = styled.div`
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  padding: 10px 20px;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
 `;
+
+const Logo = styled.img`
+  height: 40px;
+  padding: 10px 20px;
+`;
+
+const ContentWrapper = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 80px 20px 20px; // To account for the fixed header
+`;
+
 
 const Avatar = styled.img`
   width: 60px;
@@ -132,14 +160,21 @@ const Settings = () => {
       exit={{ opacity: 0 }}
     >
       <Header>
-        <Avatar src={user?.avatar} alt={user?.username} />
-        <UserInfo>
-          <Username>{user?.username}</Username>
-          <Level>Level: {user?.level}</Level>
-        </UserInfo>
+        <Logo src={logo} alt="New Logo" />
+        <Logo src={neuro} alt="Neurolov Logo" />
       </Header>
 
-      <AnimatePresence>
+      <ContentWrapper>
+        <Header>
+          <Avatar src={user?.avatar} alt={user?.username} />
+          <UserInfo>
+            <Username>{user?.username}</Username>
+            <Level>Level: {user?.level}</Level>
+          </UserInfo>
+        </Header>
+
+        <AnimatePresence>
+
         <SettingsSection
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -245,6 +280,8 @@ const Settings = () => {
           </SettingsItem>
         </SettingsSection>
 
+       </AnimatePresence>
+
         <Button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -263,7 +300,7 @@ const Settings = () => {
           <IconWrapper><FaTrash /></IconWrapper>
           Delete Account
         </Button>
-      </AnimatePresence>
+      </ContentWrapper>
 
       <Navbar />
     </SettingsWrapper>

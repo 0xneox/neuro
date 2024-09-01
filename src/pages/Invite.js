@@ -4,81 +4,122 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { generateReferralCode, applyReferralCode } from '../services/api';
 import useApi from '../hooks/useApi';
 import Navbar from '../components/Navbar';
-import coinIcon from '../Images/GPU.png';
+import { FaUsers, FaCopy, FaShareAlt } from 'react-icons/fa';
+import defaultAvatar from "../Images/second.png";
+import logo from '../Images/logo.png';
+import neuro from '../Images/logo1.png';
+import backgroundImage from "../Images/bg_pattern.svg";
 
 const InviteWrapper = styled(motion.div)`
-  padding: 20px;
+  position: relative;
+  min-height: 100vh;
+  width: 100vw;
   color: #ffffff;
   background: linear-gradient(180deg, #000033 0%, #000066 100%);
-  min-height: 100vh;
+  background-image: url(${backgroundImage});
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+`;
+
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+`;
+
+const Logo = styled.img`
+  height: 40px;
+  padding: 10px 20px;
+`;
+
+const ContentWrapper = styled.div`
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-top: 80px; // To account for the fixed header
+  padding-bottom: 20px;
 `;
 
-const Logo = styled.h1`
+
+const Title = styled.h1`
   font-size: 24px;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
+  text-align: center;
 `;
 
-const CoinImage = styled.img`
-  width: 150px;
-  height: 150px;
-  margin-bottom: 20px;
-`;
-
-const Title = styled.h2`
-  font-size: 24px;
+const SubTitle = styled.h2`
+  font-size: 20px;
   margin-bottom: 20px;
   text-align: center;
 `;
 
-const CodeContainer = styled.div`
+const UserInfo = styled.div`
   display: flex;
-  justify-content: center;
   align-items: center;
-  margin-bottom: 30px;
-`;
-
-const ReferralCode = styled.div`
-  background: rgba(255, 255, 255, 0.1);
-  padding: 10px 20px;
-  border-radius: 20px;
-  font-size: 18px;
-  margin-right: 10px;
-`;
-
-const CopyButton = styled(motion.button)`
-  background: #3d85c6;
-  color: #ffffff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 20px;
-  cursor: pointer;
-`;
-
-const XPEarned = styled.div`
-  background: #3d85c6;
-  color: #ffffff;
-  padding: 5px 15px;
-  border-radius: 20px;
-  font-size: 14px;
-  margin-bottom: 30px;
-`;
-
-const RewardList = styled.div`
+  justify-content: space-between;
   width: 100%;
   margin-bottom: 30px;
 `;
 
+const UserDetail = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const Avatar = styled.img`
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 10px;
+`;
+
+const UserName = styled.span`
+  font-size: 18px;
+  font-weight: bold;
+`;
+
+const CPLevel = styled.span`
+  font-size: 14px;
+  opacity: 0.8;
+`;
+
+const Referrals = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const ReferralIcon = styled(FaUsers)`
+  margin-right: 5px;
+`;
+
+const RewardSection = styled.div`
+  width: 100%;
+  margin-bottom: 30px;
+`;
+
+const RewardTitle = styled.h3`
+  font-size: 18px;
+  margin-bottom: 15px;
+  text-align: center;
+`;
+
 const RewardItem = styled.div`
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 10px;
 `;
 
 const RewardInfo = styled.div`
@@ -86,18 +127,16 @@ const RewardInfo = styled.div`
   align-items: center;
 `;
 
-const RewardXP = styled.span`
-  font-size: 18px;
-  font-weight: bold;
+const RewardIcon = styled(FaUsers)`
   margin-right: 10px;
 `;
 
-const RewardToken = styled.span`
+const RewardText = styled.span`
   font-size: 16px;
 `;
 
 const ClaimButton = styled(motion.button)`
-  background: #00c853;
+  background: #3d85c6;
   color: #ffffff;
   border: none;
   padding: 8px 20px;
@@ -105,15 +144,70 @@ const ClaimButton = styled(motion.button)`
   cursor: pointer;
 `;
 
-const InviteButton = styled(motion.button)`
+const UsersCount = styled.div`
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+`;
+
+const InviteLinkSection = styled.div`
+  width: 100%;
+  margin-bottom: 20px;
+`;
+
+const InviteLink = styled.div`
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const LinkText = styled.span`
+  font-size: 14px;
+  opacity: 0.8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const ActionButton = styled(motion.button)`
   background: #3d85c6;
   color: #ffffff;
   border: none;
-  padding: 15px 40px;
-  border-radius: 30px;
-  font-size: 18px;
+  padding: 8px 20px;
+  border-radius: 20px;
   cursor: pointer;
-  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const BonusInfo = styled.div`
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 20px;
+`;
+
+const ReferralsList = styled.div`
+  width: 100%;
+`;
+
+const ReferralsTitle = styled.h3`
+  font-size: 18px;
+  margin-bottom: 15px;
+`;
+
+const NoReferrals = styled.p`
+  text-align: center;
+  opacity: 0.8;
 `;
 
 const Invite = () => {
@@ -131,13 +225,13 @@ const Invite = () => {
     }
   }, [generatedCode]);
 
-  const handleCopyCode = () => {
-    navigator.clipboard.writeText(referralCode);
-    // Show a toast or some feedback that the code was copied
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(`https://t.me/OfficialNeroBot?start=${referralCode}`);
+    // Show a toast or some feedback that the link was copied
   };
 
-  const handleInvite = () => {
-    // Implement the invite functionality (e.g., open a share dialog)
+  const handleShare = () => {
+    // Implement share functionality
   };
 
   return (
@@ -146,56 +240,95 @@ const Invite = () => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <Logo>NEUROLV</Logo>
-      <CoinImage src={coinIcon} alt="Coin" />
-      <Title>Invite Friends to Earn More</Title>
-      <CodeContainer>
-        <ReferralCode>{referralCode}</ReferralCode>
-        <CopyButton
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={handleCopyCode}
-        >
-          Copy code
-        </CopyButton>
-      </CodeContainer>
-      <XPEarned>350 XP earned</XPEarned>
-      <RewardList>
+      <Header>
+        <Logo src={logo} alt="New Logo" />
+        <Logo src={neuro} alt="Neurolov Logo" />
+      </Header>
+
+      <ContentWrapper>
+        <Title>Refer and Earn</Title>
+        <UserInfo>
+          <UserDetail>
+            <Avatar src={defaultAvatar} alt="User Avatar" />
+            <div>
+              <UserName>ALEX</UserName>
+              <CPLevel>CP 2</CPLevel>
+            </div>
+          </UserDetail>
+          <Referrals>
+            <ReferralIcon /> 6 Referrals
+          </Referrals>
+        </UserInfo>
+       
+
+      <RewardSection>
+        <RewardTitle>Referral Rewards</RewardTitle>
         <AnimatePresence>
-          {[100, 100, 100].map((xp, index) => (
-           <RewardItem
-           key={index}
-           as={motion.div}
-           initial={{ opacity: 0, y: 20 }}
-           animate={{ opacity: 1, y: 0 }}
-           exit={{ opacity: 0, y: -20 }}
-           transition={{ delay: index * 0.1 }}
-         >
-           <RewardInfo>
-             <RewardXP>{xp}XP</RewardXP>
-             <RewardToken>$NLOV</RewardToken>
-           </RewardInfo>
-           <ClaimButton
-             whileHover={{ scale: 1.05 }}
-             whileTap={{ scale: 0.95 }}
-           >
-             {index < 2 ? 'Claim' : 'Claimed'}
-           </ClaimButton>
-         </RewardItem>
-       ))}
-     </AnimatePresence>
-   </RewardList>
-   <p>With each friend you invite, you can get up to 1000 XP and 10% of XP he earned.</p>
-   <InviteButton
-     whileHover={{ scale: 1.05 }}
-     whileTap={{ scale: 0.95 }}
-     onClick={handleInvite}
-   >
-     Invite Friends
-   </InviteButton>
-   <Navbar />
- </InviteWrapper>
-);
+          {[
+            { friends: 1, reward: 10000 },
+            { friends: 3, reward: 50000 },
+            { friends: 5, reward: 150000 },
+          ].map((item, index) => (
+            <RewardItem
+              key={index}
+              as={motion.div}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <RewardInfo>
+                <RewardIcon />
+                <RewardText>Invite {item.friends} friend{item.friends > 1 ? 's' : ''}</RewardText>
+              </RewardInfo>
+              <RewardText>{item.reward.toLocaleString()}</RewardText>
+              <ClaimButton
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Claim
+              </ClaimButton>
+            </RewardItem>
+          ))}
+        </AnimatePresence>
+      </RewardSection>
+
+      <UsersCount>0 Users</UsersCount>
+
+      <InviteLinkSection>
+        <InviteLink>
+          <LinkText>https://t.me/OfficialNeroBot?start={referralCode}</LinkText>
+          <ButtonGroup>
+            <ActionButton
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleCopyLink}
+            >
+              <FaCopy />
+              Copy
+            </ActionButton>
+            <ActionButton
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleShare}
+            >
+              <FaShareAlt />
+              Share
+            </ActionButton>
+          </ButtonGroup>
+        </InviteLink>
+      </InviteLinkSection>
+
+      <BonusInfo>Invite and get %0.5 Bonus for each friend</BonusInfo>
+
+      <ReferralsList>
+        <ReferralsTitle>My Referrals:</ReferralsTitle>
+        <NoReferrals>You don't have referrals😢</NoReferrals>
+      </ReferralsList>
+      </ContentWrapper>
+      <Navbar />
+    </InviteWrapper>
+  );
 };
 
 export default Invite;
