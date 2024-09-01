@@ -1,2 +1,2 @@
-# neuro
-TG UI
+# microapp-ui
+app ui
