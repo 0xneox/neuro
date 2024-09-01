@@ -18,7 +18,7 @@
     "react-tsparticles": "^1.37.5",
     "recharts": "^2.12.7",
     "recoil": "^0.5.2",
-    "styled-components": "^5.3.11"
+    "styled-components": "^5.3.11",
     "react-confetti": "^9.6.7"
   },
   "scripts": {
