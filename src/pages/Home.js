@@ -9,9 +9,9 @@ import { FaUsers } from 'react-icons/fa';
 import fanImage from "../Images/newfan.png";
 import defaultAvatar from "../Images/second.png";
 import breathingLight from "../Images/breath_1.svg";
-import backgroundImage from "../Images/bg_pattern.svg";
+import backgroundImage from "../Images/bg5.jpg";
 import tokenSymbolSvg from "../Images/questIcon.png";
-import logoLeft from "../Images/logo.png";
+import logoLeft from "../Images/logoo.png";
 import logoRight from "../Images/logo1.png";
 import { triggerHapticFeedback } from '../utils/haptics';
 import { useSettings } from '../context/SettingsContext';
@@ -65,6 +65,7 @@ const Header = styled.header`
 
 const Logo = styled.img`
   height: 40px;
+  width: auto;
 `;
 
 const UserSection = styled.div`

@@ -5,10 +5,49 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import { FaUsers } from 'react-icons/fa';
 import Navbar from '../components/Navbar';
 import defaultAvatar from "../Images/second.png";
-import backgroundImage from "../Images/bg_pattern.svg";
-import logoLeft from "../Images/logo.png";
+import backgroundImage from "../Images/bg5.jpg";
+import logoLeft from "../Images/logoo.png";
 import logoRight from "../Images/logo1.png";
 
+const ProfileWrapper = styled(motion.div)`
+  position: relative;
+  min-height: 100vh;
+  width: 100vw;
+  color: #ffffff;
+  background-color: #000033;
+  background-image: url(${backgroundImage});
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+`;
+
+const Header = styled.header`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+`;
+
+const Logo = styled.img`
+  height: 40px;
+  width: auto;
+`;
+
+const ContentWrapper = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 80px 20px 70px;
+  overflow-y: auto;
+`;
 
 const UserSection = styled(motion.div)`
   display: flex;
@@ -112,44 +151,6 @@ const SectionTitle = styled(motion.h3)`
   padding-left: 15px;
 `;
 
-
-const ProfileWrapper = styled(motion.div)`
-  position: relative;
-  min-height: 100vh;
-  width: 100vw;
-  color: #ffffff;
-  background-color: #000033;
-  background-image: url(${backgroundImage});
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  flex-direction: column;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 20px;
-  width: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  box-sizing: border-box;
-  position: absolute;
-  top: 0;
-`;
-
-const Logo = styled.img`
-  height: 40px;
-  padding: 10px 20px;
-`;
-
-const ContentWrapper = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 80px 20px 20px; // To account for the fixed header
-`;
-
 const Profile = () => {
   // Mock data
   const mockUser = {
@@ -206,6 +207,7 @@ const Profile = () => {
       }
     }
   };
+
   return (
     <ProfileWrapper
       variants={containerVariants}
@@ -213,62 +215,65 @@ const Profile = () => {
       animate="visible"
     >
       <Header>
-        <Logo src={logoLeft} alt="New Logo" />
-        <Logo src={logoRight} alt="Neurolov Logo" />
+        <Logo src={logoLeft} alt="Left Logo" />
+        <Logo src={logoRight} alt="Right Logo" />
       </Header>
 
-      <UserSection variants={itemVariants}>
-        <UserInfo>
-          <Avatar 
-            src={mockUser.avatar} 
-            alt={mockUser.username} 
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          />
-          <UserDetails variants={wobbleVariants} whileHover="hover">
-            <Username>{mockUser.username}</Username>
-            <UserID>ID: {mockUser.id}</UserID>
-            <CPLevel>CP Level: {mockUser.cpLevel}</CPLevel>
-          </UserDetails>
-        </UserInfo>
-        <ButtonGroup>
-          <Button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>Join Channel</Button>
-          <Button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}><FaUsers /> {mockUser.referrals}</Button>
-        </ButtonGroup>
-      </UserSection>
+      <ContentWrapper>
+        <UserSection variants={itemVariants}>
+          <UserInfo>
+            <Avatar 
+              src={mockUser.avatar} 
+              alt={mockUser.username} 
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            />
+            <UserDetails variants={wobbleVariants} whileHover="hover">
+              <Username>{mockUser.username}</Username>
+              <UserID>ID: {mockUser.id}</UserID>
+              <CPLevel>CP Level: {mockUser.cpLevel}</CPLevel>
+            </UserDetails>
+          </UserInfo>
+          <ButtonGroup>
+            <Button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>Join Channel</Button>
+            <Button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}><FaUsers /> {mockUser.referrals}
+            </Button>
+          </ButtonGroup>
+        </UserSection>
 
-      <StatsGrid variants={itemVariants}>
-        {[
-          { value: mockUser.xp.toLocaleString(), label: 'XP' },
-          { value: mockUser.computePower, label: 'Compute Power' },
-          { value: mockUser.totalTaps.toLocaleString(), label: 'Total Taps' }
-        ].map((stat, index) => (
-          <StatCard 
-            key={index} 
-            whileHover={{ scale: 1.05, rotate: [0, 2, -2, 0] }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            <StatValue>{stat.value}</StatValue>
-            <StatLabel>{stat.label}</StatLabel>
-          </StatCard>
-        ))}
-      </StatsGrid>
+        <StatsGrid variants={itemVariants}>
+          {[
+            { value: mockUser.xp.toLocaleString(), label: 'XP' },
+            { value: mockUser.computePower, label: 'Compute Power' },
+            { value: mockUser.totalTaps.toLocaleString(), label: 'Total Taps' }
+          ].map((stat, index) => (
+            <StatCard 
+              key={index} 
+              whileHover={{ scale: 1.05, rotate: [0, 2, -2, 0] }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <StatValue>{stat.value}</StatValue>
+              <StatLabel>{stat.label}</StatLabel>
+            </StatCard>
+          ))}
+        </StatsGrid>
 
-      <SectionTitle variants={itemVariants}>Activity Graph</SectionTitle>
-      <ChartContainer 
-        variants={itemVariants}
-        whileHover={{ scale: 1.02 }}
-        transition={{ type: "spring", stiffness: 300 }}
-      >
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={activityData}>
-            <XAxis dataKey="name" stroke="#ffffff" />
-            <YAxis stroke="#ffffff" />
-            <Tooltip />
-            <Line type="monotone" dataKey="xp" stroke="#8884d8" strokeWidth={2} />
-          </LineChart>
-        </ResponsiveContainer>
-      </ChartContainer>
+        <SectionTitle variants={itemVariants}>Activity Graph</SectionTitle>
+        <ChartContainer 
+          variants={itemVariants}
+          whileHover={{ scale: 1.02 }}
+          transition={{ type: "spring", stiffness: 300 }}
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={activityData}>
+              <XAxis dataKey="name" stroke="#ffffff" />
+              <YAxis stroke="#ffffff" />
+              <Tooltip />
+              <Line type="monotone" dataKey="xp" stroke="#8884d8" strokeWidth={2} />
+            </LineChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </ContentWrapper>
 
       <Navbar />
     </ProfileWrapper>

@@ -7,9 +7,9 @@ import { claimDailyXP, createUserProfile, initializeTelegramAuth } from '../serv
 import useApi from '../hooks/useApi';
 import { useAuth } from '../context/AuthContext';
 import backgroundVideo from '../videos/video.mp4';
-import fallbackImage from '../Images/claimbg.jpg';
-import logo from '../Images/logo.png';
-import neuro from '../Images/logo1.png'; // New logo for the left side
+import fallbackImage from '../Images/bg5.jpg';
+import logo from '../Images/logoo.png';
+import neuro from '../Images/logo1.png';
 
 const CheckInWrapper = styled.div`
   position: relative;
@@ -51,13 +51,6 @@ const Header = styled.div`
 
 const Logo = styled.img`
   height: 40px;
-
-    padding: 10px 20px;
-
-`;
-
-const Neuro = styled.img`
-  height: 40px;
   width: auto;
 `;
 
@@ -91,7 +84,7 @@ const XPText = styled(motion.div)`
 `;
 
 const ClaimButton = styled.button`
- align-items: center;
+  align-items: center;
   background-image: linear-gradient(144deg,#AF40FF, #5B42F3 50%,#00DDEB);
   border: 0;
   border-radius: 8px;
@@ -114,26 +107,32 @@ const ClaimButton = styled.button`
   cursor: pointer;
   transition: all .3s;
 
-
-
-  span {
-      background-color: rgb(5, 6, 45);
-  padding: 16px 24px;
-  border-radius: 6px;
-  width: 100%;
-  height: 100%;
-  transition: 300ms;
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
+  span {
+    background-color: rgb(5, 6, 45);
+    padding: 16px 24px;
+    border-radius: 6px;
+    width: 100%;
+    height: 100%;
+    transition: 300ms;
+  }
+`;
 
-
-
+const ErrorMessage = styled.div`
+  color: #ff6b6b;
+  margin-top: 10px;
+  font-size: 14px;
 `;
 
 function CheckIn() {
   const [claimed, setClaimed] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
   const { execute: executeClaim, loading: claimLoading } = useApi(claimDailyXP);
@@ -157,6 +156,7 @@ function CheckIn() {
             }
           } catch (error) {
             console.error('Failed to initialize user:', error);
+            setError('Failed to initialize user. Please try again.');
           }
         }
       } else if (user.lastClaimTime && Date.now() - new Date(user.lastClaimTime).getTime() < 24 * 60 * 60 * 1000) {
@@ -170,10 +170,10 @@ function CheckIn() {
     if (claimLoading) return;
 
     try {
-      await executeClaim();
+      const result = await executeClaim();
       setClaimed(true);
       setShowConfetti(true);
-      setUser(prevUser => ({ ...prevUser, xp: (prevUser?.xp || 0) + 100, lastClaimTime: new Date() }));
+      setUser(prevUser => ({ ...prevUser, xp: (prevUser?.xp || 0) + result.xpGained, lastClaimTime: new Date() }));
 
       setTimeout(() => {
         setShowConfetti(false);
@@ -181,6 +181,7 @@ function CheckIn() {
       }, 3000);
     } catch (error) {
       console.error('Claim failed:', error);
+      setError('Failed to claim daily XP. Please try again later.');
     }
   };
 
@@ -198,8 +199,8 @@ function CheckIn() {
         </VideoBackground>
       )}
       <Header>
-        <Logo src={logo} alt="New Logo" /> {/* Left Logo */}
-        <Neuro src={neuro} alt="Neurolov Logo" /> {/* Right Logo */}
+        <Logo src={logo} alt="New Logo" />
+        <Logo src={neuro} alt="Neurolov Logo" />
       </Header>
       <Content>
         <ClaimTitle>Daily Claim</ClaimTitle>
@@ -213,10 +214,10 @@ function CheckIn() {
             100 XP
           </XPText>
         </AnimatePresence>
-        <ClaimButton onClick={handleClaim} disabled={claimed}>
-         
-          <span>{claimed ? 'Claimed!' : 'Claim'}</span>
+        <ClaimButton onClick={handleClaim} disabled={claimed || claimLoading}>
+          <span>{claimed ? 'Claimed!' : claimLoading ? 'Claiming...' : 'Claim'}</span>
         </ClaimButton>
+        {error && <ErrorMessage>{error}</ErrorMessage>}
       </Content>
       {showConfetti && <Confetti />}
     </CheckInWrapper>
@@ -224,9 +225,3 @@ function CheckIn() {
 }
 
 export default CheckIn;
-
-/* From Uiverse.io by cssbuttons-io */ 
-
- 
-
- 

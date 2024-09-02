@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
-import { generateReferralCode, applyReferralCode } from '../services/api';
+import { generateReferralCode, applyReferralCode, getReferralStats } from '../services/api';
 import useApi from '../hooks/useApi';
 import Navbar from '../components/Navbar';
 import { FaUsers, FaCopy, FaShareAlt } from 'react-icons/fa';
+import { useAuth } from '../context/AuthContext';
 import defaultAvatar from "../Images/second.png";
-import logo from '../Images/logo.png';
+import logo from '../Images/logoo.png';
 import neuro from '../Images/logo1.png';
-import backgroundImage from "../Images/bg_pattern.svg";
+import backgroundImage from "../Images/bg5.jpg";
 
 const InviteWrapper = styled(motion.div)`
   position: relative;
@@ -31,13 +32,14 @@ const Header = styled.div`
   width: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   box-sizing: border-box;
-  position: absolute;
+  position: fixed;
   top: 0;
+  z-index: 1000;
 `;
 
 const Logo = styled.img`
   height: 40px;
-  padding: 10px 20px;
+  width: auto;
 `;
 
 const ContentWrapper = styled.div`
@@ -45,20 +47,13 @@ const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 80px; // To account for the fixed header
-  padding-bottom: 20px;
+  padding: 80px 20px 70px;
+  overflow-y: auto;
 `;
-
 
 const Title = styled.h1`
   font-size: 24px;
   margin-bottom: 10px;
-  text-align: center;
-`;
-
-const SubTitle = styled.h2`
-  font-size: 20px;
-  margin-bottom: 20px;
   text-align: center;
 `;
 
@@ -112,7 +107,7 @@ const RewardTitle = styled.h3`
   text-align: center;
 `;
 
-const RewardItem = styled.div`
+const RewardItem = styled(motion.div)`
   background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   padding: 15px;
@@ -125,10 +120,6 @@ const RewardItem = styled.div`
 const RewardInfo = styled.div`
   display: flex;
   align-items: center;
-`;
-
-const RewardIcon = styled(FaUsers)`
-  margin-right: 10px;
 `;
 
 const RewardText = styled.span`
@@ -211,27 +202,63 @@ const NoReferrals = styled.p`
 `;
 
 const Invite = () => {
+  const { user } = useAuth();
   const [referralCode, setReferralCode] = useState('');
-  const { execute: generateCode, data: generatedCode } = useApi(generateReferralCode);
-  const { execute: applyCode, loading, error } = useApi(applyReferralCode);
+  const [referralStats, setReferralStats] = useState(null);
+  const { execute: generateCode } = useApi(generateReferralCode);
+  const { execute: applyCode } = useApi(applyReferralCode);
+  const { execute: fetchReferralStats } = useApi(getReferralStats);
 
   useEffect(() => {
-    generateCode();
-  }, [generateCode]);
+    const initializeReferralCode = async () => {
+      if (!user?.referralCode) {
+        try {
+          const { referralCode } = await generateCode();
+          setReferralCode(referralCode);
+        } catch (error) {
+          console.error('Failed to generate referral code:', error);
+        }
+      } else {
+        setReferralCode(user.referralCode);
+      }
+    };
+    const fetchStats = async () => {
+      try {
+        const stats = await fetchReferralStats();
+        setReferralStats(stats);
+      } catch (error) {
+        console.error('Failed to fetch referral stats:', error);
+      }
+    };
 
-  useEffect(() => {
-    if (generatedCode) {
-      setReferralCode(generatedCode.referralCode);
-    }
-  }, [generatedCode]);
+    initializeReferralCode();
+    fetchStats();
+  }, [user, generateCode, fetchReferralStats]);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(`https://t.me/OfficialNeroBot?start=${referralCode}`);
-    // Show a toast or some feedback that the link was copied
+    // Implement a toast or notification to show the link was copied
   };
 
   const handleShare = () => {
     // Implement share functionality
+    // This could open a native share dialog on mobile devices
+    if (navigator.share) {
+      navigator.share({
+        title: 'Join me on Neurolov!',
+        text: 'Use my referral code to get started!',
+        url: `https://t.me/OfficialNeroBot?start=${referralCode}`
+      }).catch(console.error);
+    } else {
+      // Fallback for desktop or unsupported browsers
+      handleCopyLink();
+    }
+  };
+
+  const handleClaim = async (rewardId) => {
+    // Implement claim functionality
+    // This should call an API to claim the reward and update the UI
+    console.log(`Claiming reward ${rewardId}`);
   };
 
   return (
@@ -249,82 +276,93 @@ const Invite = () => {
         <Title>Refer and Earn</Title>
         <UserInfo>
           <UserDetail>
-            <Avatar src={defaultAvatar} alt="User Avatar" />
+            <Avatar src={user?.avatar || defaultAvatar} alt="User Avatar" />
             <div>
-              <UserName>ALEX</UserName>
-              <CPLevel>CP 2</CPLevel>
+              <UserName>{user?.username || 'User'}</UserName>
+              <CPLevel>CP {user?.cpLevel || 1}</CPLevel>
             </div>
           </UserDetail>
           <Referrals>
-            <ReferralIcon /> 6 Referrals
+            <ReferralIcon /> {referralStats?.totalReferrals || 0} Referrals
           </Referrals>
         </UserInfo>
        
+        <RewardSection>
+          <RewardTitle>Referral Rewards</RewardTitle>
+          <AnimatePresence>
+            {[
+              { id: 1, friends: 1, reward: 10000 },
+              { id: 2, friends: 3, reward: 50000 },
+              { id: 3, friends: 5, reward: 150000 },
+            ].map((item) => (
+              <RewardItem
+                key={item.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <RewardInfo>
+                  <ReferralIcon />
+                  <RewardText>Invite {item.friends} friend{item.friends > 1 ? 's' : ''}</RewardText>
+                </RewardInfo>
+                <RewardText>{item.reward.toLocaleString()} XP</RewardText>
+                <ClaimButton
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleClaim(item.id)}
+                  disabled={referralStats?.totalReferrals < item.friends}
+                >
+                  {referralStats?.totalReferrals >= item.friends ? 'Claim' : 'Locked'}
+                </ClaimButton>
+              </RewardItem>
+            ))}
+          </AnimatePresence>
+        </RewardSection>
 
-      <RewardSection>
-        <RewardTitle>Referral Rewards</RewardTitle>
-        <AnimatePresence>
-          {[
-            { friends: 1, reward: 10000 },
-            { friends: 3, reward: 50000 },
-            { friends: 5, reward: 150000 },
-          ].map((item, index) => (
-            <RewardItem
-              key={index}
-              as={motion.div}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <RewardInfo>
-                <RewardIcon />
-                <RewardText>Invite {item.friends} friend{item.friends > 1 ? 's' : ''}</RewardText>
-              </RewardInfo>
-              <RewardText>{item.reward.toLocaleString()}</RewardText>
-              <ClaimButton
+        <UsersCount>{referralStats?.totalReferrals || 0} Users</UsersCount>
+
+        <InviteLinkSection>
+          <InviteLink>
+            <LinkText>https://t.me/OfficialNeroBot?start={referralCode}</LinkText>
+            <ButtonGroup>
+              <ActionButton
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={handleCopyLink}
               >
-                Claim
-              </ClaimButton>
-            </RewardItem>
-          ))}
-        </AnimatePresence>
-      </RewardSection>
+                <FaCopy />
+                Copy
+              </ActionButton>
+              <ActionButton
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleShare}
+              >
+                <FaShareAlt />
+                Share
+              </ActionButton>
+            </ButtonGroup>
+          </InviteLink>
+        </InviteLinkSection>
 
-      <UsersCount>0 Users</UsersCount>
+        <BonusInfo>Invite and get 0.5% Bonus for each friend</BonusInfo>
 
-      <InviteLinkSection>
-        <InviteLink>
-          <LinkText>https://t.me/OfficialNeroBot?start={referralCode}</LinkText>
-          <ButtonGroup>
-            <ActionButton
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleCopyLink}
-            >
-              <FaCopy />
-              Copy
-            </ActionButton>
-            <ActionButton
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleShare}
-            >
-              <FaShareAlt />
-              Share
-            </ActionButton>
-          </ButtonGroup>
-        </InviteLink>
-      </InviteLinkSection>
-
-      <BonusInfo>Invite and get %0.5 Bonus for each friend</BonusInfo>
-
-      <ReferralsList>
-        <ReferralsTitle>My Referrals:</ReferralsTitle>
-        <NoReferrals>You don't have referrals😢</NoReferrals>
-      </ReferralsList>
+        <ReferralsList>
+          <ReferralsTitle>My Referrals:</ReferralsTitle>
+          {referralStats?.referrals && referralStats.referrals.length > 0 ? (
+            referralStats.referrals.map((referral, index) => (
+              <RewardItem key={index}>
+                <UserDetail>
+                  <Avatar src={referral.avatar || defaultAvatar} alt={referral.username} />
+                  <UserName>{referral.username}</UserName>
+                </UserDetail>
+                <CPLevel>CP {referral.cpLevel}</CPLevel>
+              </RewardItem>
+            ))
+          ) : (
+            <NoReferrals>You don't have referrals yet 😢</NoReferrals>
+          )}
+        </ReferralsList>
       </ContentWrapper>
       <Navbar />
     </InviteWrapper>

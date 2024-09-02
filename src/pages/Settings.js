@@ -6,9 +6,9 @@ import { updateSettings } from '../services/api';
 import useApi from '../hooks/useApi';
 import Navbar from '../components/Navbar';
 import { FaBell, FaVolumeMute, FaGlobe, FaEye, FaQuestionCircle, FaShieldAlt, FaFileContract, FaSignOutAlt, FaTrash } from 'react-icons/fa';
-import logo from '../Images/logo.png';
-import neuro from '../Images/logo1.png';
-import backgroundImage from "../Images/bg_pattern.svg";
+import logoLeft from '../Images/logoo.png';
+import logoRight from '../Images/logo1.png';
+import backgroundImage from "../Images/bg5.jpg";
 
 const SettingsWrapper = styled(motion.div)`
   position: relative;
@@ -23,30 +23,38 @@ const SettingsWrapper = styled(motion.div)`
   flex-direction: column;
 `;
 
-const Header = styled.div`
+const Header = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
+  padding: 20px;
   width: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   box-sizing: border-box;
-  position: absolute;
+  position: fixed;
   top: 0;
+  left: 0;
+  z-index: 1000;
 `;
 
 const Logo = styled.img`
   height: 40px;
-  padding: 10px 20px;
+  width: auto;
 `;
 
 const ContentWrapper = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 80px 20px 20px; // To account for the fixed header
+  padding: 80px 20px 70px;
+  overflow-y: auto;
 `;
 
+const UserSection = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+`;
 
 const Avatar = styled.img`
   width: 60px;
@@ -160,36 +168,35 @@ const Settings = () => {
       exit={{ opacity: 0 }}
     >
       <Header>
-        <Logo src={logo} alt="New Logo" />
-        <Logo src={neuro} alt="Neurolov Logo" />
+        <Logo src={logoLeft} alt="Left Logo" />
+        <Logo src={logoRight} alt="Right Logo" />
       </Header>
 
       <ContentWrapper>
-        <Header>
+        <UserSection>
           <Avatar src={user?.avatar} alt={user?.username} />
           <UserInfo>
             <Username>{user?.username}</Username>
             <Level>Level: {user?.level}</Level>
           </UserInfo>
-        </Header>
+        </UserSection>
 
         <AnimatePresence>
-
-        <SettingsSection
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-        >
-          <SettingsItem>
-            <SettingsLabel>
-              <IconWrapper><FaBell /></IconWrapper>
-              Alert Notifications
-            </SettingsLabel>
-            <Toggle isOn={notifications} onClick={handleToggle(setNotifications)}>
-              <Handle layout transition={{ type: "spring", stiffness: 700, damping: 30 }} />
-            </Toggle>
-          </SettingsItem>
-        </SettingsSection>
+          <SettingsSection
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+          >
+            <SettingsItem>
+              <SettingsLabel>
+                <IconWrapper><FaBell /></IconWrapper>
+                Alert Notifications
+              </SettingsLabel>
+              <Toggle isOn={notifications} onClick={handleToggle(setNotifications)}>
+                <Handle layout transition={{ type: "spring", stiffness: 700, damping: 30 }} />
+              </Toggle>
+            </SettingsItem>
+          </SettingsSection>
 
         <SettingsSection
           initial={{ opacity: 0, y: 20 }}
@@ -268,19 +275,18 @@ const Settings = () => {
         </SettingsSection>
 
         <SettingsSection
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-        >
-          <SettingsItem>
-            <SettingsLabel>
-              <IconWrapper><FaFileContract /></IconWrapper>
-              Terms of Service
-            </SettingsLabel>
-          </SettingsItem>
-        </SettingsSection>
-
-       </AnimatePresence>
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+          >
+            <SettingsItem>
+              <SettingsLabel>
+                <IconWrapper><FaFileContract /></IconWrapper>
+                Terms of Service
+              </SettingsLabel>
+            </SettingsItem>
+          </SettingsSection>
+        </AnimatePresence>
 
         <Button
           whileHover={{ scale: 1.05 }}

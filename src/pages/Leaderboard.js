@@ -4,8 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaUsers, FaTrophy } from 'react-icons/fa';
 import Navbar from '../components/Navbar';
 import trophyIcon from '../Images/trophy.svg';
-import backgroundImage from "../Images/bg_pattern.svg";
-import logoLeft from "../Images/logo.png";
+import backgroundImage from "../Images/bg5.jpg";
+import logoLeft from "../Images/logoo.png";
 import logoRight from "../Images/logo1.png";
 import defaultAvatar from "../Images/second.png";
 
@@ -36,7 +36,7 @@ const Header = styled.div`
 
 const Logo = styled.img`
   height: 40px;
-  padding: 10px 20px;
+  width: auto;
 `;
 
 const ContentWrapper = styled.div`
