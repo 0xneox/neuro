@@ -70,10 +70,6 @@ const XPEarned = styled.div`
   font-size: 14px;
 `;
 
-
-
-
-
 const TabContainer = styled.div`
   display: flex;
   background-color: rgba(255, 255, 255, 0.1);
@@ -169,24 +165,25 @@ const ErrorWrapper = styled.div`
   margin-top: 20px;
   font-size: 16px;
 `;
+
 const mockQuests = [
-  { id: 1, title: 'ツイッターをフォロー', description: '公式Twitterアカウントをフォローする', icon: <FaTwitter />, claimed: false, locked: false },
-  { id: 2, title: 'ツイートをリツイート', description: '最新の告知ツイートをリツイートする', icon: <FaTwitter />, claimed: false, locked: false },
-  { id: 3, title: 'Discordに参加', description: '公式Discordサーバーに参加する', icon: <FaDiscord />, claimed: false, locked: false },
-  { id: 4, title: 'Discordで挨拶', description: '自己紹介チャンネルで挨拶する', icon: <FaDiscord />, claimed: false, locked: false },
-  { id: 5, title: 'Telegramグループに参加', description: '公式Telegramグループに参加する', icon: <FaTelegram />, claimed: false, locked: false },
-  { id: 6, title: '友達を招待', description: '友達を1人ゲームに招待する', icon: <FaCheckCircle />, claimed: false, locked: false },
-  { id: 7, title: 'デイリーログイン', description: '7日間連続でログインする', icon: <FaCheckCircle />, claimed: false, locked: false },
-  { id: 8, title: 'GPUをアップグレード', description: 'GPUを1回アップグレードする', icon: <FaCheckCircle />, claimed: false, locked: true },
-  { id: 9, title: '100回タップ', description: 'GPUを100回タップする', icon: <FaCheckCircle />, claimed: false, locked: false },
-  { id: 10, title: '1000 NLOVを獲得', description: '合計1000 NLOVを獲得する', icon: <FaCheckCircle />, claimed: false, locked: true },
+  { id: 1, title: 'Follow on Twitter', description: 'Follow the official Twitter account', icon: <FaTwitter />, claimed: false, locked: false },
+  { id: 2, title: 'Retweet Tweet', description: 'Retweet the latest announcement tweet', icon: <FaTwitter />, claimed: false, locked: false },
+  { id: 3, title: 'Join Discord', description: 'Join the official Discord server', icon: <FaDiscord />, claimed: false, locked: false },
+  { id: 4, title: 'Greet in Discord', description: 'Say hello in the introduction channel', icon: <FaDiscord />, claimed: false, locked: false },
+  { id: 5, title: 'Join Telegram Group', description: 'Join the official Telegram group', icon: <FaTelegram />, claimed: false, locked: false },
+  { id: 6, title: 'Invite a Friend', description: 'Invite a friend to the game', icon: <FaCheckCircle />, claimed: false, locked: false },
+  { id: 7, title: 'Daily Login', description: 'Log in for 7 consecutive days', icon: <FaCheckCircle />, claimed: false, locked: false },
+  { id: 8, title: 'Upgrade GPU', description: 'Upgrade your GPU once', icon: <FaCheckCircle />, claimed: false, locked: true },
+  { id: 9, title: 'Tap 100 Times', description: 'Tap the GPU 100 times', icon: <FaCheckCircle />, claimed: false, locked: false },
+  { id: 10, title: 'Earn 1000 NLOV', description: 'Earn a total of 1000 NLOV', icon: <FaCheckCircle />, claimed: false, locked: true },
 ];
 
 const mockAchievements = [
-  { id: 1, title: '初心者マイナー', description: '初めてGPUをタップする', icon: '🏆', progress: 1, required: 1, claimed: true },
-  { id: 2, title: 'ソーシャルバタフライ', description: '全てのソーシャルクエストを完了する', icon: '🦋', progress: 3, required: 5, claimed: false },
-  { id: 3, title: 'アップグレードマスター', description: 'GPUを10回アップグレードする', icon: '🚀', progress: 3, required: 10, claimed: false },
-  { id: 4, title: 'NLOV億万長者', description: '100,000 NLOVを獲得する', icon: '💰', progress: 25000, required: 100000, claimed: false },
+  { id: 1, title: 'Beginner Miner', description: 'Tap the GPU for the first time', icon: '🏆', progress: 1, required: 1, claimed: true },
+  { id: 2, title: 'Social Butterfly', description: 'Complete all social quests', icon: '🦋', progress: 3, required: 5, claimed: false },
+  { id: 3, title: 'Upgrade Master', description: 'Upgrade the GPU 10 times', icon: '🚀', progress: 3, required: 10, claimed: false },
+  { id: 4, title: 'NLOV Millionaire', description: 'Earn 100,000 NLOV', icon: '💰', progress: 25000, required: 100000, claimed: false },
 ];
 
 const Quest = () => {
@@ -230,98 +227,94 @@ const Quest = () => {
     }
   };
 
+  const renderQuests = () => {
+    if (questsLoading) {
+      return <LoadingWrapper>Loading quests...</LoadingWrapper>;
+    }
+
+    if (questsError) {
+      return <ErrorWrapper>Failed to load quests. Please try again later.</ErrorWrapper>;
+    }
+
+    return quests.map(quest => (
+      <ItemWrapper key={quest.id}>
+        <ItemInfo>
+          <ItemIcon>{quest.icon}</ItemIcon>
+          <ItemDetails>
+            <ItemTitle>{quest.title}</ItemTitle>
+            <ItemDescription>{quest.description}</ItemDescription>
+          </ItemDetails>
+        </ItemInfo>
+        <ActionButton
+          claimed={quest.claimed}
+          locked={quest.locked}
+          onClick={() => !quest.claimed && !quest.locked && handleQuestClaim(quest.id)}
+        >
+          {quest.claimed ? 'Claimed' : quest.locked ? 'Locked' : 'Claim'}
+        </ActionButton>
+      </ItemWrapper>
+    ));
+  };
+
+  const renderAchievements = () => {
+    if (achievementsLoading) {
+      return <LoadingWrapper>Loading achievements...</LoadingWrapper>;
+    }
+
+    if (achievementsError) {
+      return <ErrorWrapper>Failed to load achievements. Please try again later.</ErrorWrapper>;
+    }
+
+    return achievements.map(achievement => (
+      <ItemWrapper key={achievement.id}>
+        <ItemInfo>
+          <ItemIcon>{achievement.icon}</ItemIcon>
+          <ItemDetails>
+            <ItemTitle>{achievement.title}</ItemTitle>
+            <ItemDescription>{achievement.description}</ItemDescription>
+          </ItemDetails>
+        </ItemInfo>
+        <ActionButton
+          claimed={achievement.claimed}
+          onClick={() => !achievement.claimed && handleAchievementClaim(achievement.id)}
+        >
+          {achievement.claimed ? 'Claimed' : 'Claim'}
+        </ActionButton>
+      </ItemWrapper>
+    ));
+  };
+
   const renderContent = () => {
-    if (questsLoading || achievementsLoading) {
-      return <LoadingWrapper>読み込み中...</LoadingWrapper>;
+    if (activeTab === 'quest') {
+      return renderQuests();
+    } else if (activeTab === 'achievement') {
+      return renderAchievements();
     }
-
-    if (questsError || achievementsError) {
-      return <ErrorWrapper>データの読み込みに失敗しました。後でもう一度お試しください。</ErrorWrapper>;
-    }
-
-    return (
-      <AnimatePresence mode="wait">
-        {activeTab === 'quest' && (
-          <motion.div
-            key="quests"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            {quests.map(quest => (
-              <ItemWrapper key={quest.id}>
-                <ItemInfo>
-                  <ItemIcon>{quest.icon}</ItemIcon>
-                  <ItemDetails>
-                    <ItemTitle>{quest.title}</ItemTitle>
-                    <ItemDescription>{quest.description}</ItemDescription>
-                  </ItemDetails>
-                </ItemInfo>
-                <ActionButton 
-                  onClick={() => handleQuestClaim(quest.id)}
-                  disabled={quest.claimed || quest.locked || questClaimLoading}
-                  claimed={quest.claimed}
-                  locked={quest.locked}
-                >
-                  {quest.claimed ? '完了' : quest.locked ? <><FaLock /> ロック</> : 'クリア'}
-                </ActionButton>
-              </ItemWrapper>
-            ))}
-          </motion.div>
-        )}
-
-        {activeTab === 'achievement' && (
-          <motion.div
-            key="achievements"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            {achievements.map(achievement => (
-              <ItemWrapper key={achievement.id}>
-                <ItemInfo>
-                  <ItemIcon>{achievement.icon}</ItemIcon>
-                  <ItemDetails>
-                    <ItemTitle>{achievement.title}</ItemTitle>
-                    <ItemDescription>{achievement.description}</ItemDescription>
-                  </ItemDetails>
-                </ItemInfo>
-                <ActionButton 
-                  onClick={() => handleAchievementClaim(achievement.id)}
-                  disabled={achievement.claimed || achievement.progress < achievement.required || achievementClaimLoading}
-                  claimed={achievement.claimed}
-                >
-                  {achievement.claimed ? '獲得済み' : `${achievement.progress}/${achievement.required}`}
-                </ActionButton>
-              </ItemWrapper>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    );
   };
 
   return (
     <QuestWrapper>
       <Header>
-        <Logo src={logoLeft} alt="Left Logo" />
-        <Logo src={logoRight} alt="Right Logo" />
+        <Logo src={logoLeft} alt="Logo" />
+        <Navbar />
+        <Logo src={logoRight} alt="Logo" />
       </Header>
 
       <ContentWrapper>
         <SubHeader>
           <DropdownButton>
-            デイリークエスト <FaChevronDown />
+            Current Quest
+            <FaChevronDown style={{marginLeft: '5px'}} />
           </DropdownButton>
-          <XPEarned>350 XP 獲得</XPEarned>
+          <XPEarned>XP Earned: 5000</XPEarned>
         </SubHeader>
 
         <TabContainer>
           <Tab active={activeTab === 'quest'} onClick={() => setActiveTab('quest')}>
-            <FaGem style={{marginRight: '5px'}} /> クエスト
+            <FaGem style={{marginRight: '5px'}} /> Quests
           </Tab>
           <Tab active={activeTab === 'achievement'} onClick={() => setActiveTab('achievement')}>
-            <FaTrophy style={{marginRight: '5px'}} /> 実績
+            <FaTrophy style={{marginRight: '5px'}} /> Achievements
           </Tab>
         </TabContainer>
 
@@ -329,7 +322,6 @@ const Quest = () => {
           {renderContent()}
         </Content>
       </ContentWrapper>
-      <Navbar />
     </QuestWrapper>
   );
 };
